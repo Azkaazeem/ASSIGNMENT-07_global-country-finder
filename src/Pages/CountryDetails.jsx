@@ -30,14 +30,25 @@ export default function CountryDetails() {
   if (!country) return null;
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden p-6 md:p-10 mt-6">
-      <Link to="/" className="inline-block mb-6 px-4 py-2 bg-gray-200 text-gray-800 font-medium rounded hover:bg-gray-300 transition">
-        &larr; Back to Home
+    <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden p-6 md:p-10 mt-6 animate-[fade-in_0.5s_ease-in-out]">
+      
+      {/* Back button with sliding arrow animation */}
+      <Link 
+        to="/" 
+        className="group inline-flex items-center mb-6 px-4 py-2 bg-gray-200 text-gray-800 font-medium rounded hover:bg-gray-300 hover:shadow-md transition-all duration-300"
+      >
+        <span className="transform group-hover:-translate-x-1 transition-transform duration-300 mr-2">&larr;</span> 
+        Back to Home
       </Link>
       
       <div className="flex flex-col md:flex-row gap-10">
-        <div className="w-full md:w-1/2">
-          <img src={country.flags.svg} alt={`Flag of ${country.name.common}`} className="w-full h-auto rounded border shadow-sm" />
+        <div className="w-full md:w-1/2 overflow-hidden rounded border shadow-sm">
+          {/* Subtle zoom effect on flag hover */}
+          <img 
+            src={country.flags.svg} 
+            alt={`Flag of ${country.name.common}`} 
+            className="w-full h-auto hover:scale-105 transition-transform duration-500" 
+          />
         </div>
         
         <div className="w-full md:w-1/2">

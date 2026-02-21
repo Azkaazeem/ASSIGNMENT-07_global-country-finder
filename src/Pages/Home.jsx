@@ -44,12 +44,12 @@ export default function Home() {
 
   return (
     <div>
-      {/* Search Bar */}
+      {/* Search Bar - Enhanced with focus ring and hover shadow */}
       <div className="mb-8 max-w-md mx-auto">
         <input 
           type="text" 
           placeholder="Search country by name..." 
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-500 hover:shadow-md transition-all duration-300"
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
