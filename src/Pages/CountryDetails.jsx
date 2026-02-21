@@ -1,74 +1,176 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import Loading from '../Comp/Loading';
+import Swal from 'sweetalert2';
+import { 
+  ArrowLeft, Building2, Users, Globe2, 
+  MapPin, Coins, Languages 
+} from 'lucide-react';
 
 export default function CountryDetails() {
   const { name } = useParams();
+  const navigate = useNavigate();
   const [country, setCountry] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchCountryDetail = async () => {
       try {
         const response = await fetch(`https://restcountries.com/v3.1/name/${name}?fullText=true`);
-        if (!response.ok) throw new Error('Country details not found!');
+        if (!response.ok) throw new Error('Country details not found or API is down.');
+        
         const data = await response.json();
         setCountry(data[0]);
         setLoading(false);
       } catch (err) {
-        console.error("Fetch Error: ", err); // For debugging
-        setError(err.message);
         setLoading(false);
+        Swal.fire({
+          title: 'Error Fetching Data',
+          text: err.message,
+          icon: 'error',
+          confirmButtonColor: '#3b82f6',
+          confirmButtonText: 'Go Back'
+        }).then(() => {
+          navigate('/');
+        });
       }
     };
+    
     fetchCountryDetail();
-  }, [name]);
+  }, [name, navigate]);
 
   if (loading) return <Loading />;
-  if (error) return <div className="text-center text-red-500 text-2xl mt-10">Error: {error}</div>;
   if (!country) return null;
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden p-6 md:p-10 mt-6 animate-[fade-in_0.5s_ease-in-out]">
+    <div className="max-w-5xl mx-auto mt-6 animate-fade-in">
       
-      {/* Back button with sliding arrow animation */}
+      {/* Premium Back Button */}
       <Link 
         to="/" 
-        className="group inline-flex items-center mb-6 px-4 py-2 bg-gray-200 text-gray-800 font-medium rounded hover:bg-gray-300 hover:shadow-md transition-all duration-300"
+        className="group inline-flex items-center mb-8 px-5 py-2.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-semibold rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300"
       >
-        <span className="transform group-hover:-translate-x-1 transition-transform duration-300 mr-2">&larr;</span> 
-        Back to Home
+        <ArrowLeft className="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform duration-300 text-gray-500 dark:text-gray-400 group-hover:text-blue-500 dark:group-hover:text-blue-400" /> 
+        Back to Dashboard
       </Link>
       
-      <div className="flex flex-col md:flex-row gap-10">
-        <div className="w-full md:w-1/2 overflow-hidden rounded border shadow-sm">
-          {/* Subtle zoom effect on flag hover */}
-          <img 
-            src={country.flags.svg} 
-            alt={`Flag of ${country.name.common}`} 
-            className="w-full h-auto hover:scale-105 transition-transform duration-500" 
-          />
-        </div>
-        
-        <div className="w-full md:w-1/2">
-          <h1 className="text-4xl font-bold mb-6 text-blue-900">{country.name.common}</h1>
-          <div className="space-y-3 text-lg text-gray-700">
-            <p><strong className="text-black">Official Name:</strong> {country.name.official}</p>
-            <p><strong className="text-black">Capital:</strong> {country.capital ? country.capital.join(', ') : 'N/A'}</p>
-            <p><strong className="text-black">Population:</strong> {country.population.toLocaleString()}</p>
-            <p><strong className="text-black">Region:</strong> {country.region}</p>
-            <p><strong className="text-black">Subregion:</strong> {country.subregion || 'N/A'}</p>
+      {/* Main Detail Card */}
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors duration-500 hover:shadow-2xl">
+        <div className="flex flex-col lg:flex-row">
+          
+          {/* Left Column: Flag Image */}
+          <div className="w-full lg:w-1/2 p-6 lg:p-10 flex items-center justify-center bg-gray-50 dark:bg-gray-900/50">
+            <div className="relative group w-full overflow-hidden rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
+              <img 
+                src={country.flags.svg} 
+                alt={`Flag of ${country.name.common}`} 
+                className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105" 
+              />
+            </div>
+          </div>
+          
+          {/* Right Column: Information */}
+          <div className="w-full lg:w-1/2 p-6 lg:p-10 flex flex-col justify-center">
             
-            <p><strong className="text-black">Languages:</strong> {country.languages ? Object.values(country.languages).join(', ') : 'N/A'}</p>
-            <p><strong className="text-black">Currencies:</strong> {
-              country.currencies 
-              ? Object.values(country.currencies).map(c => `${c.name} (${c.symbol})`).join(', ')
-              : 'N/A'
-            }</p>
+            <h1 className="text-4xl lg:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 mb-2 tracking-tight">
+              {country.name.common}
+            </h1>
+            <p className="text-lg text-gray-500 dark:text-gray-400 font-medium mb-8">
+              {country.name.official}
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              
+              {/* Capital Box */}
+              <div className="flex items-start gap-3">
+                <div className="p-2.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg">
+                  <Building2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Capital</p>
+                  <p className="text-gray-900 dark:text-white font-semibold">{country.capital ? country.capital.join(', ') : 'N/A'}</p>
+                </div>
+              </div>
+
+              {/* Population Box */}
+              <div className="flex items-start gap-3">
+                <div className="p-2.5 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-lg">
+                  <Users className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Population</p>
+                  <p className="text-gray-900 dark:text-white font-semibold">{country.population.toLocaleString()}</p>
+                </div>
+              </div>
+
+              {/* Region Box */}
+              <div className="flex items-start gap-3">
+                <div className="p-2.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-lg">
+                  <Globe2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Region</p>
+                  <p className="text-gray-900 dark:text-white font-semibold">{country.region}</p>
+                </div>
+              </div>
+
+              {/* Subregion Box */}
+              <div className="flex items-start gap-3">
+                <div className="p-2.5 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-lg">
+                  <MapPin className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Sub Region</p>
+                  <p className="text-gray-900 dark:text-white font-semibold">{country.subregion || 'N/A'}</p>
+                </div>
+              </div>
+
+            </div>
+
+            <hr className="my-8 border-gray-200 dark:border-gray-700" />
+
+            {/* Badges Section for Languages and Currencies */}
+            <div className="space-y-6">
+              
+              {/* Languages */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Languages className="w-5 h-5 text-gray-400" />
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">Languages</h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {country.languages ? Object.values(country.languages).map((lang, index) => (
+                    <span key={index} className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-full shadow-sm">
+                      {lang}
+                    </span>
+                  )) : (
+                    <span className="text-gray-500">N/A</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Currencies */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Coins className="w-5 h-5 text-gray-400" />
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">Currencies</h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {country.currencies ? Object.values(country.currencies).map((curr, index) => (
+                    <span key={index} className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-medium rounded-full shadow-sm border border-blue-100 dark:border-blue-800">
+                      {curr.name} ({curr.symbol})
+                    </span>
+                  )) : (
+                    <span className="text-gray-500">N/A</span>
+                  )}
+                </div>
+              </div>
+
+            </div>
+
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
